@@ -28,34 +28,6 @@ const Page = (props: Props) => {
   const [files, setFiles] = useState<FileList>();
   const [list, setList] = useState<ListItem[]>([]);
 
-  // const list = [
-  //   {
-  //     name: "Clothes",
-  //     quantity: 1,
-  //     icon: <ShirtIcon className="size-8" />,
-  //   },
-  //   {
-  //     name: "Shoes",
-  //     quantity: 3,
-  //     icon: <Footprints className="size-8" />,
-  //   },
-  //   {
-  //     name: "Books",
-  //     quantity: 5,
-  //     icon: <Book className="size-8" />,
-  //   },
-  //   {
-  //     name: "Fruits",
-  //     quantity: 2,
-  //     icon: <Apple className="size-8" />,
-  //   },
-  //   {
-  //     name: "Food",
-  //     quantity: 5,
-  //     icon: <ChefHat className="size-8" />,
-  //   },
-  // ];
-
   // before the files are sent, they have to be converted to base64
   const convertFilesToBase64 = async () => {
     if (!files) return;
@@ -76,26 +48,22 @@ const Page = (props: Props) => {
 
   // Get the labels from the images. If there are the same labels, they will be combined and the quantity will be increased
   const processLabels = async (
-    labels: google.cloud.vision.v1.IEntityAnnotation[][], // TODO: Fix this type. Also make sure it corresponds with the backend
+    labelsArr: google.cloud.vision.v1.IEntityAnnotation[][], // TODO: Fix this type. Also make sure it corresponds with the backend
   ) => {
     const newItems: ListItem[] = [];
-    labels.forEach((label) => {
-      const name = label.description || "Unknown";
-      const icon = <Box className="size-8" />;
-      const quantity = 1;
+    labelsArr.forEach((labels) => {
+      labels.forEach((label) => {
+        if (label.score && label.score < 0.7) return;
+        const name = label.description as string;
+        const icon = <Box className="size-8" />;
+        const existingItem = newItems.find((item) => item.name === name);
 
-      let found = false;
-      for (let i = 0; i < newItems.length; i++) {
-        if (newItems[i].name === name) {
-          newItems[i].quantity++;
-          found = true;
-          break;
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          newItems.push({ name, quantity: 1, icon });
         }
-      }
-
-      if (!found) {
-        newItems.push({ name, quantity, icon });
-      }
+      });
     });
 
     setList(newItems);
@@ -115,12 +83,13 @@ const Page = (props: Props) => {
     });
 
     const { labels } = await response.json();
+    console.log(labels);
     processLabels(labels);
   };
 
   return (
     <div className="grid min-h-96 grid-cols-2 grid-rows-1 space-x-8 divide-x-4 divide-dotted px-20 py-12 ">
-      <div className="flex flex-col justify-between ">
+      <div className="flex flex-col justify-between">
         <div className="space-y-8">
           <div className="space-y-1">
             <h1 className="relative inline-flex items-center gap-x-1  text-4xl font-bold">
@@ -186,7 +155,7 @@ const Page = (props: Props) => {
 
           <div className="pb-6">
             {files && (
-              <div className="scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thin scrollbar-thumb-primary scrollbar-track-slate-50 flex max-h-[30rem] flex-col gap-4 overflow-y-auto">
+              <div className="flex max-h-[15rem] flex-col gap-4 overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-300 scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
                 {Array.from(files).map((file, index) => (
                   <div
                     key={index}
@@ -235,7 +204,7 @@ const Page = (props: Props) => {
           {/* <Link href={"/map"}> */}
           <Button
             onClick={sendFiles}
-            className="space-x-4 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+            className="sticky bottom-0 space-x-4 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
             variant={"default"}
             size={"lg"}
           >
@@ -266,7 +235,7 @@ const Page = (props: Props) => {
           </svg>
         </h2>
 
-        <div className="scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thin scrollbar-thumb-primary scrollbar-track-slate-50 max-h-[43rem] space-y-8 overflow-auto pr-4">
+        <div className="max-h-[30rem] space-y-8 overflow-auto pr-4 scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-300 scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
           {list.map((item, index) => (
             <div
               key={index}

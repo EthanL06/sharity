@@ -7,7 +7,7 @@ const Logo = (props: Props) => {
       href={"/"}
       className="text-center font-sans text-4xl font-bold text-primary"
     >
-      shary.
+      sharity.
     </Link>
   );
 };

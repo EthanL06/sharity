@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import vision from "@google-cloud/vision";
-import fs from "fs/promises";
-import path from "path";
 import { google } from "@google-cloud/vision/build/protos/protos";
 
 export async function POST(request: Request) {

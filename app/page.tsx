@@ -22,19 +22,31 @@ export default function Home() {
     <main className="relative flex flex-1 items-center justify-center space-y-4 p-8 pt-6">
       <div className="relative flex  h-[35rem] w-full flex-col items-center justify-center rounded-md   antialiased  bg-dot-large-slate-400/50">
         <div className="mx-auto mb-2 flex max-w-3xl flex-col items-center p-4">
-          <Link
-            href={"/"}
-            className="relative z-20  text-center font-sans text-3xl  font-bold  text-primary md:text-4xl"
-          >
+          <div className="flex flex-col items-center">
+            <Link
+              href={"/"}
+              className="relative z-20  text-center font-sans text-3xl  font-bold  text-primary md:text-4xl"
+            >
+              <motion.div
+                variants={fadeInAnimationVariants}
+                initial="initial"
+                whileInView="animate"
+                custom={0}
+              >
+                sharity.
+              </motion.div>
+            </Link>
+
             <motion.div
               variants={fadeInAnimationVariants}
               initial="initial"
               whileInView="animate"
               custom={0}
+              className="z-20 mr-3 text-center text-sm font-semibold text-slate-500"
             >
-              shary.
+              /shehr • ity/
             </motion.div>
-          </Link>
+          </div>
           <motion.div
             variants={fadeInAnimationVariants}
             initial="initial"
@@ -45,9 +57,9 @@ export default function Home() {
           >
             We make
             <br />
-            donating easier
+            donating easier.
             <svg
-              className="absolute bottom-[-6px] right-[2px] hidden md:block "
+              className="absolute bottom-[-6px] right-[9px] hidden md:block "
               width="149"
               height="14"
               viewBox="0 0 149 14"
