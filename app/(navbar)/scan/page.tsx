@@ -2,12 +2,12 @@
 type Props = {};
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
+import { google } from "@google-cloud/vision/build/protos/protos";
 import {
   Apple,
   ArrowRightCircle,
   Book,
+  Box,
   ChefHat,
   CircleHelp,
   CloudUpload,
@@ -16,38 +16,45 @@ import {
   TrashIcon,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
+
+type ListItem = {
+  name: string;
+  quantity: number;
+  icon: JSX.Element;
+};
+
 const Page = (props: Props) => {
   const [files, setFiles] = useState<FileList>();
+  const [list, setList] = useState<ListItem[]>([]);
 
-  const list = [
-    {
-      name: "Clothes",
-      quantity: 1,
-      icon: <ShirtIcon className="size-8" />,
-    },
-    {
-      name: "Shoes",
-      quantity: 3,
-      icon: <Footprints className="size-8" />,
-    },
-    {
-      name: "Books",
-      quantity: 5,
-      icon: <Book className="size-8" />,
-    },
-    {
-      name: "Fruits",
-      quantity: 2,
-      icon: <Apple className="size-8" />,
-    },
-    {
-      name: "Food",
-      quantity: 5,
-      icon: <ChefHat className="size-8" />,
-    },
-  ];
+  // const list = [
+  //   {
+  //     name: "Clothes",
+  //     quantity: 1,
+  //     icon: <ShirtIcon className="size-8" />,
+  //   },
+  //   {
+  //     name: "Shoes",
+  //     quantity: 3,
+  //     icon: <Footprints className="size-8" />,
+  //   },
+  //   {
+  //     name: "Books",
+  //     quantity: 5,
+  //     icon: <Book className="size-8" />,
+  //   },
+  //   {
+  //     name: "Fruits",
+  //     quantity: 2,
+  //     icon: <Apple className="size-8" />,
+  //   },
+  //   {
+  //     name: "Food",
+  //     quantity: 5,
+  //     icon: <ChefHat className="size-8" />,
+  //   },
+  // ];
 
   // before the files are sent, they have to be converted to base64
   const convertFilesToBase64 = async () => {
@@ -67,6 +74,33 @@ const Page = (props: Props) => {
     return base64Files;
   };
 
+  // Get the labels from the images. If there are the same labels, they will be combined and the quantity will be increased
+  const processLabels = async (
+    labels: google.cloud.vision.v1.IEntityAnnotation[][], // TODO: Fix this type. Also make sure it corresponds with the backend
+  ) => {
+    const newItems: ListItem[] = [];
+    labels.forEach((label) => {
+      const name = label.description || "Unknown";
+      const icon = <Box className="size-8" />;
+      const quantity = 1;
+
+      let found = false;
+      for (let i = 0; i < newItems.length; i++) {
+        if (newItems[i].name === name) {
+          newItems[i].quantity++;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        newItems.push({ name, quantity, icon });
+      }
+    });
+
+    setList(newItems);
+  };
+
   const sendFiles = async () => {
     const base64Files = await convertFilesToBase64();
     if (!base64Files) return;
@@ -80,8 +114,8 @@ const Page = (props: Props) => {
       body: JSON.stringify({ files: base64Files }),
     });
 
-    const data = await response.json();
-    console.log(data);
+    const { labels } = await response.json();
+    processLabels(labels);
   };
 
   return (

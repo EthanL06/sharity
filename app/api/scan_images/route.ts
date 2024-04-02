@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import vision from "@google-cloud/vision";
 import fs from "fs/promises";
 import path from "path";
+import { google } from "@google-cloud/vision/build/protos/protos";
 
 export async function POST(request: Request) {
   const credential = JSON.parse(
@@ -18,17 +19,26 @@ export async function POST(request: Request) {
     },
   });
 
-  const image = await fs.readFile(
-    path.join(process.cwd(), "public", "donations.jpg"),
-  );
+  const { files } = await request.json();
 
-  const [result] = await client.labelDetection(image);
-  console.log(result);
-  const detections = result.textAnnotations;
-  console.log("Text:");
-  if (detections) {
-    detections.forEach((text) => console.log(text));
-  }
+  const promises = files.map(async (file: string) => {
+    const image = file.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(image, "base64");
 
-  return NextResponse.json({ labels: result.labelAnnotations });
+    const [result] = await client.labelDetection(buffer);
+    const detections = result.labelAnnotations;
+
+    console.log("Labels:");
+    if (detections) {
+      detections.forEach((label) => console.log(label));
+    }
+
+    return detections;
+  });
+
+  const results = (await Promise.all(
+    promises,
+  )) as google.cloud.vision.v1.IEntityAnnotation[][];
+
+  return NextResponse.json({ labels: results });
 }

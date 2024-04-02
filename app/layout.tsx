@@ -5,6 +5,7 @@ import NavigationMenu from "@/components/navigation-menu";
 
 import { Poppins as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { TailwindIndicator } from "@/components/tailwind-indicator";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
         {/* <NavigationMenu /> */}
         <>{children}</>
         {/* </ThemeProvider> */}
+        <TailwindIndicator />
       </body>
     </html>
   );
