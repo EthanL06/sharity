@@ -72,16 +72,16 @@ const Page = (props: Props) => {
     if (!base64Files) return;
 
     console.log(base64Files);
-    // const response = await fetch("/api/scan_images", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ files: base64Files }),
-    // });
+    const response = await fetch("/api/scan_images", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ files: base64Files }),
+    });
 
-    // const data = await response.json();
-    // console.log(data);
+    const data = await response.json();
+    console.log(data);
   };
 
   return (

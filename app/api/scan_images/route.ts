@@ -3,14 +3,12 @@ import vision from "@google-cloud/vision";
 import fs from "fs/promises";
 import path from "path";
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const credential = JSON.parse(
     Buffer.from(process.env.GOOGLE_SERVICE_KEY as string, "base64")
       .toString()
       .replace(/\n/g, ""),
   );
-
-  console.log(credential);
 
   const client = new vision.ImageAnnotatorClient({
     projectId: credential.project_id,
