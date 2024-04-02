@@ -99,7 +99,7 @@ export default function Home() {
               size={"lg"}
               variant={"outline"}
             >
-              Learn More
+              Request Donations
             </Button>
           </motion.div>
         </div>

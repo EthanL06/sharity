@@ -2,6 +2,7 @@
 type Props = {};
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
   Apple,
@@ -14,7 +15,12 @@ import {
   ShirtIcon,
   TrashIcon,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 const Page = (props: Props) => {
+  const [files, setFiles] = useState<FileList>();
+
   const list = [
     {
       name: "Clothes",
@@ -43,8 +49,43 @@ const Page = (props: Props) => {
     },
   ];
 
+  // before the files are sent, they have to be converted to base64
+  const convertFilesToBase64 = async () => {
+    if (!files) return;
+
+    const promises = Array.from(files).map(async (file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise((resolve) => {
+        reader.onload = () => {
+          resolve(reader.result);
+        };
+      });
+    });
+
+    const base64Files = await Promise.all(promises);
+    return base64Files;
+  };
+
+  const sendFiles = async () => {
+    const base64Files = await convertFilesToBase64();
+    if (!base64Files) return;
+
+    console.log(base64Files);
+    // const response = await fetch("/api/scan_images", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ files: base64Files }),
+    // });
+
+    // const data = await response.json();
+    // console.log(data);
+  };
+
   return (
-    <div className="grid min-h-96 grid-cols-2 grid-rows-1 space-x-8 divide-x-4 divide-dotted ">
+    <div className="grid min-h-96 grid-cols-2 grid-rows-1 space-x-8 divide-x-4 divide-dotted px-20 py-12 ">
       <div className="flex flex-col justify-between ">
         <div className="space-y-8">
           <div className="space-y-1">
@@ -62,11 +103,43 @@ const Page = (props: Props) => {
             </p>
           </div>
 
-          <div className="flex items-center gap-x-4">
+          <div className="flex items-center gap-x-4 ">
+            <input
+              onChange={(e) => {
+                const userFiles = e.target.files;
+                if (!userFiles) return;
+
+                if (!files) {
+                  setFiles(userFiles as FileList);
+                  return;
+                }
+
+                const newFiles = Array.from(files); // Convert FileList to array
+                for (let i = 0; i < userFiles.length; i++) {
+                  newFiles.push(userFiles[i]);
+                }
+
+                // convert back to FileList
+                const newFilesList = new DataTransfer();
+                newFiles.forEach((file) => {
+                  newFilesList.items.add(file);
+                });
+
+                setFiles(newFilesList.files);
+              }}
+              id="file-picker"
+              type="file"
+              className="hidden"
+              multiple
+              accept=".jpeg, .jpg, .png, .gif, .bmp, .webp, .raw, .ico, .pdf, .tiff"
+            />
             <Button
               className="space-x-4 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
               variant={"default"}
               size={"lg"}
+              onClick={() => {
+                document.getElementById("file-picker")?.click();
+              }}
             >
               <CloudUpload className="size-8" strokeWidth={3} />{" "}
               <span>Upload Images</span>
@@ -76,17 +149,66 @@ const Page = (props: Props) => {
               Input Manually
             </Button>
           </div>
+
+          <div className="pb-6">
+            {files && (
+              <div className="scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thin scrollbar-thumb-primary scrollbar-track-slate-50 flex max-h-[30rem] flex-col gap-4 overflow-y-auto">
+                {Array.from(files).map((file, index) => (
+                  <div
+                    key={index}
+                    className="relative flex items-center gap-x-2"
+                  >
+                    <Image
+                      src={URL.createObjectURL(file)}
+                      className="size-16 rounded-lg border object-cover"
+                      width={128}
+                      height={128}
+                      alt={file.name}
+                    />
+
+                    <div className="font-medium">{file.name}</div>
+                    <Button
+                      onClick={() => {
+                        const newFiles = Array.from(files); // Convert FileList to array
+                        for (let i = 0; i < files.length; i++) {
+                          if (files[i].name === file.name) {
+                            newFiles.splice(i, 1);
+                            break;
+                          }
+                        }
+
+                        // convert back to FileList
+                        const newFilesList = new DataTransfer();
+                        newFiles.forEach((file) => {
+                          newFilesList.items.add(file);
+                        });
+
+                        setFiles(newFilesList.files);
+                      }}
+                      size={"icon"}
+                      variant={"ghost"}
+                    >
+                      <TrashIcon strokeWidth={2.75} className="text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-row-reverse">
+          {/* <Link href={"/map"}> */}
           <Button
+            onClick={sendFiles}
             className="space-x-4 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
             variant={"default"}
             size={"lg"}
           >
-            <span>Continue</span>
+            <span>Scan</span>
             <ArrowRightCircle strokeWidth={3} />
           </Button>
+          {/* </Link> */}
         </div>
       </div>
 
