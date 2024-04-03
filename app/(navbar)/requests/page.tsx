@@ -81,7 +81,7 @@ const Page = (props: Props) => {
       case 5:
         return <Loading />;
       case 6:
-        return <SubmissionComplete formData={formData} />;
+        return <SubmissionComplete />;
     }
   };
 
@@ -117,7 +117,7 @@ const Loading = () => {
     </div>
   );
 };
-const SubmissionComplete = ({ formData }) => {
+const SubmissionComplete = () => {
   return (
     <Card>
       <CardHeader>
