@@ -248,8 +248,8 @@ const Page = (props: Props) => {
   };
 
   return (
-    <div className="grid h-full grow grid-cols-10 grid-rows-1 overflow-x-hidden">
-      <div className="col-span-3  px-8 py-8">
+    <div className="grid h-full grow grid-cols-1 grid-rows-2 overflow-x-hidden lg:grid-cols-10 lg:grid-rows-1">
+      <div className="flex flex-col items-center px-8 py-8 lg:col-span-3">
         <h1 className="text-center text-4xl font-semibold">
           Locations Near You.
         </h1>
@@ -305,13 +305,13 @@ const Page = (props: Props) => {
         <div className=" mt-6 text-center text-2xl font-semibold text-slate-700">
           Donations Needed
         </div>
-        <div className="mt-4 grid grid-cols-3 grid-rows-1 gap-x-2">
+        <div className="mt-4 grid grid-cols-3 grid-rows-1 flex-wrap items-center gap-4  gap-x-2 lg:flex xl:grid">
           {places[placeIndex % places.length].donationsNeeded.map(
             (donation, index) => (
               <div
                 key={index}
                 className={cn(
-                  " flex flex-col items-center justify-center rounded border px-1 py-4",
+                  " flex h-full grow flex-col items-center justify-center rounded border px-1 py-4",
                   isIncludedInList(donation.item)
                     ? "outline outline-green-500"
                     : "bg-white",

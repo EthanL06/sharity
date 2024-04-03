@@ -115,8 +115,8 @@ const Page = (props: Props) => {
   };
 
   return (
-    <div className=" grid min-h-[calc(100vh-150px)] grid-cols-2 grid-rows-1 space-x-8 divide-x-4 divide-dotted px-20 py-12">
-      <div className="flex flex-col ">
+    <div className=" grid grid-cols-1 grid-rows-2 space-x-8 divide-y-4 divide-dotted px-6 py-12 lg:px-20 min-[1140px]:grid-cols-2 min-[1140px]:grid-rows-1 min-[1140px]:divide-x-4 min-[1140px]:divide-y-0">
+      <div className="flex flex-col pb-8">
         <div className="space-y-8">
           <div className="space-y-1">
             <h1 className="relative inline-flex items-center gap-x-1  text-4xl font-bold">
@@ -153,7 +153,7 @@ const Page = (props: Props) => {
             </p>
           </div>
 
-          <div className="flex items-center gap-x-4 ">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:justify-start">
             <input
               onChange={(e) => {
                 const userFiles = e.target.files;
@@ -270,23 +270,11 @@ const Page = (props: Props) => {
           </div>
         </div>
 
-        <div className="flex flex-row-reverse gap-x-2">
-          <Button
-            onClick={() => router.push("/map")}
-            disabled={list.length === 0 || loading}
-            className="sticky bottom-0 space-x-3 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
-            variant={"default"}
-            size={"lg"}
-          >
-            <span>Confirm Items</span>
-
-            <ArrowRightCircle strokeWidth={3} />
-          </Button>
-
+        <div className="flex flex-row flex-wrap justify-center gap-2 sm:justify-end ">
           <Button
             disabled={loading || !files}
             onClick={sendFiles}
-            className="sticky bottom-0 space-x-3 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+            className=" space-x-3 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
             variant={"default"}
             size={"lg"}
           >
@@ -294,10 +282,22 @@ const Page = (props: Props) => {
 
             <Search strokeWidth={3} />
           </Button>
+
+          <Button
+            onClick={() => router.push("/map")}
+            disabled={list.length === 0 || loading}
+            className="space-x-3 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+            variant={"default"}
+            size={"lg"}
+          >
+            <span>Confirm Items</span>
+
+            <ArrowRightCircle strokeWidth={3} />
+          </Button>
         </div>
       </div>
 
-      <div className="flex  flex-col space-y-8 pl-8">
+      <div className="flex  flex-col space-y-8 pt-8 min-[1140px]:pl-8 min-[1140px]:pt-0">
         <h2 className="relative text-4xl font-bold">
           <span>Your List</span>
           <svg
@@ -324,7 +324,7 @@ const Page = (props: Props) => {
               className="flex items-center justify-between space-x-4"
             >
               <div className="flex items-center gap-x-3">
-                {item.icon}
+                <div className="shrink-0">{item.icon}</div>
                 <span className="text-2xl font-semibold">{item.name}</span>
               </div>
               <div className="flex items-center gap-x-4">
