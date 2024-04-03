@@ -229,8 +229,8 @@ const Page = (props: Props) => {
   useEffect(() => {
     // Ask for user's location
     navigator.geolocation.getCurrentPosition((position) => {
-      setLng(position.coords.longitude);
-      setLat(position.coords.latitude);
+      setLng(-95.816528);
+      setLat(29.794861);
 
       setInitialLng(position.coords.longitude);
       setInitialLat(position.coords.latitude);
@@ -249,7 +249,7 @@ const Page = (props: Props) => {
 
   return (
     <div className="grid h-full grow grid-cols-10 grid-rows-1 overflow-x-hidden">
-      <div className="col-span-3  px-8 pt-8">
+      <div className="col-span-3  px-8 py-8">
         <h1 className="text-center text-4xl font-semibold">
           Locations Near You.
         </h1>
