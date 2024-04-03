@@ -23,13 +23,24 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+type Place = {
+  name: string;
+  latitude: number;
+  longitude: number;
+  address: string;
+};
+
 type Props = {};
 const Page = (props: Props) => {
   const mapRef = useRef<MapRef | null>(null);
   const { list, setList } = useList();
   const [lng, setLng] = useState<number>();
   const [lat, setLat] = useState<number>();
+  const [initialLng, setInitialLng] = useState<number>();
+  const [initialLat, setInitialLat] = useState<number>();
   const [zoom, setZoom] = useState(11);
+
+  // const [places, setPlaces] = useState<Place[]>([]);
 
   const [placeIndex, setPlaceIndex] = useState(0);
 
@@ -39,84 +50,154 @@ const Page = (props: Props) => {
       latitude: 29.802444299999998,
       longitude: -95.80743009999999,
       address: "5140 Franz Rd Suite 700, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "blanket", current: 20, needs: 50 },
+        { item: "canned food", current: 25, needs: 40 },
+        { item: "toiletries", current: 15, needs: 30 },
+      ],
     },
     {
       name: "Katy Heritage Society",
       latitude: 29.791165,
       longitude: -95.82595239999999,
       address: "5990 George Bush Dr, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "hygiene products", current: 10, needs: 25 },
+        { item: "baby formula", current: 30, needs: 60 },
+        { item: "socks", current: 40, needs: 70 },
+      ],
     },
     {
       name: "The Arc Of Katy",
       latitude: 29.7944224,
       longitude: -95.8241022,
       address: "5819 10th St C, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "school supplies", current: 20, needs: 45 },
+        { item: "diapers", current: 15, needs: 35 },
+        { item: "winter coats", current: 25, needs: 50 },
+      ],
     },
     {
       name: "Color Codes Foundation",
       latitude: 29.7880394,
       longitude: -95.79476269999999,
       address: "24600 Katy Fwy Suite 834 - 1075, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "books", current: 30, needs: 60 },
+        { item: "canned soup", current: 20, needs: 40 },
+        { item: "gloves", current: 10, needs: 30 },
+      ],
     },
     {
       name: "St. Vincent de Paul Society",
       latitude: 29.797258699999997,
       longitude: -95.8137802,
       address: "5356 11th St, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "cleaning supplies", current: 15, needs: 35 },
+        { item: "non-perishable food", current: 25, needs: 50 },
+        { item: "winter hats", current: 20, needs: 40 },
+      ],
     },
     {
       name: "Act of Life Inc.",
       latitude: 29.7867236,
       longitude: -95.820758,
       address: "5510 1st St, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "baby clothes", current: 30, needs: 60 },
+        { item: "cereal", current: 20, needs: 40 },
+        { item: "toothbrushes", current: 10, needs: 30 },
+      ],
     },
     {
       name: "Vanessa's Big Heart Foundation",
       latitude: 29.747612099999998,
       longitude: -95.7729732,
       address: "2306 Morning Park Dr, Katy, TX 77494",
+      donationsNeeded: [
+        { item: "toys", current: 25, needs: 50 },
+        { item: "juice boxes", current: 15, needs: 30 },
+        { item: "baby wipes", current: 20, needs: 40 },
+      ],
     },
     {
       name: "Baraka Services",
       latitude: 29.7695208,
       longitude: -95.7880611,
       address: "24222 Calico Trace Ln, Katy, TX 77494",
+      donationsNeeded: [
+        { item: "bedding sets", current: 20, needs: 45 },
+        { item: "canned vegetables", current: 30, needs: 60 },
+        { item: "socks", current: 25, needs: 50 },
+      ],
     },
     {
       name: "Heart4Heroes",
       latitude: 29.785776499999997,
       longitude: -95.8245093,
       address: "None, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "first aid kits", current: 15, needs: 30 },
+        { item: "rice", current: 20, needs: 40 },
+        { item: "baby blankets", current: 25, needs: 50 },
+      ],
     },
     {
       name: "Katy Responds",
       latitude: 29.733881,
       longitude: -95.763025,
       address: "22765 Westheimer Pkwy, Katy, TX 77450",
+      donationsNeeded: [
+        { item: "canned meat", current: 20, needs: 40 },
+        { item: "backpacks", current: 25, needs: 50 },
+        { item: "feminine hygiene products", current: 15, needs: 30 },
+      ],
     },
     {
       name: "Young Life",
       latitude: 29.776955299999997,
       longitude: -95.7438576,
       address: "423 Mason Park Blvd b1, Katy, TX 77450",
+      donationsNeeded: [
+        { item: "winter gloves", current: 25, needs: 50 },
+        { item: "snacks", current: 20, needs: 40 },
+        { item: "flashlights", current: 15, needs: 30 },
+      ],
     },
     {
       name: "Joe Joe Bear Foundation",
       latitude: 29.792361999999997,
       longitude: -95.723044,
       address: "1846 Snake River Rd, Katy, TX 77449",
+      donationsNeeded: [
+        { item: "teddy bears", current: 30, needs: 60 },
+        { item: "pasta", current: 20, needs: 40 },
+        { item: "coloring books", current: 25, needs: 50 },
+      ],
     },
     {
       name: "Compassion Katy",
       latitude: 29.7746042,
       longitude: -95.73002319999999,
       address: "802 Dominion Dr #900a, Katy, TX 77450",
+      donationsNeeded: [
+        { item: "school uniforms", current: 15, needs: 30 },
+        { item: "canned fruit", current: 20, needs: 40 },
+        { item: "toothpaste", current: 25, needs: 50 },
+      ],
     },
     {
       name: "Making Things Matter",
       latitude: 29.732466,
       longitude: -95.7637898,
       address: "5703 2nd St, Katy, TX 77493",
+      donationsNeeded: [
+        { item: "pillows", current: 20, needs: 45 },
+        { item: "canned beans", current: 25, needs: 50 },
+        { item: "soap", current: 15, needs: 30 },
+      ],
     },
   ];
 
@@ -130,13 +211,41 @@ const Page = (props: Props) => {
     });
   };
 
+  // useEffect(() => {
+  //   if (initialLng == undefined || initialLat == undefined) {
+  //     return;
+  //   }
+
+  //   console.log(initialLng, initialLat);
+
+  //   fetch(`/api/find_nearby?lat=${initialLng}&lon=${initialLat}`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log(data);
+  //       setPlaces(data);
+  //     });
+  // }, [initialLng, initialLat]);
+
   useEffect(() => {
     // Ask for user's location
     navigator.geolocation.getCurrentPosition((position) => {
       setLng(position.coords.longitude);
       setLat(position.coords.latitude);
+
+      setInitialLng(position.coords.longitude);
+      setInitialLat(position.coords.latitude);
     });
   }, [lng, lat]);
+
+  if (places.length == 0) {
+    return <div>Loading...</div>;
+  }
+
+  const isIncludedInList = (item: string) => {
+    return list.some((listItem) => {
+      return listItem.name.toLowerCase() == item.toLowerCase();
+    });
+  };
 
   return (
     <div className="grid h-full grow grid-cols-10 grid-rows-1 overflow-x-hidden">
@@ -153,7 +262,7 @@ const Page = (props: Props) => {
 
         <div className="mt-6 flex items-center justify-center gap-x-4">
           <Button
-            className="rounded-full"
+            className="shrink-0 rounded-full"
             size={"icon"}
             variant={"default"}
             onClick={() => {
@@ -181,7 +290,7 @@ const Page = (props: Props) => {
             </div>
           </div>
           <Button
-            className="rounded-full"
+            className="shrink-0 rounded-full"
             size={"icon"}
             variant={"default"}
             onClick={() => {
@@ -197,65 +306,37 @@ const Page = (props: Props) => {
           Donations Needed
         </div>
         <div className="mt-4 grid grid-cols-3 grid-rows-1 gap-x-2">
-          <div className=" flex flex-col items-center justify-center rounded px-1 py-4 outline outline-green-300">
-            <div className="size-24">
-              <CircularProgressbar
-                styles={buildStyles({
-                  strokeLinecap: "round",
-                  pathColor: `rgba(37, 99, 235)`,
-                  trailColor: "#d6d6d6",
-                  textColor: "#2563EB",
-                  textSize: "1.5rem",
-                })}
-                value={70}
-                text={"70%"}
-              />
-            </div>
+          {places[placeIndex % places.length].donationsNeeded.map(
+            (donation, index) => (
+              <div
+                key={index}
+                className={cn(
+                  " flex flex-col items-center justify-center rounded border px-1 py-4",
+                  isIncludedInList(donation.item)
+                    ? "outline outline-green-500"
+                    : "bg-white",
+                )}
+              >
+                <div className="size-24">
+                  <CircularProgressbar
+                    styles={buildStyles({
+                      strokeLinecap: "round",
+                      pathColor: `rgba(37, 99, 235)`,
+                      trailColor: "#d6d6d6",
+                      textColor: "#2563EB",
+                      textSize: "1.5rem",
+                    })}
+                    value={(donation.current / donation.needs) * 100}
+                    text={`${Math.floor((donation.current / donation.needs) * 100)}%`}
+                  />
+                </div>
 
-            <div className="mt-2 grow text-pretty text-center text-base font-medium text-slate-600">
-              26 blankets needed
-            </div>
-          </div>
-
-          <div className=" flex flex-col items-center justify-center rounded border px-1 py-4">
-            <div className="size-24">
-              <CircularProgressbar
-                styles={buildStyles({
-                  strokeLinecap: "round",
-                  pathColor: `rgba(37, 99, 235)`,
-                  trailColor: "#d6d6d6",
-                  textColor: "#2563EB",
-                  textSize: "1.5rem",
-                })}
-                value={30}
-                text={"30%"}
-              />
-            </div>
-
-            <div className="mt-2 grow text-pretty text-center text-base font-medium text-slate-600">
-              55 canned goods needed
-            </div>
-          </div>
-
-          <div className=" flex flex-col items-center justify-center rounded border px-1 py-4">
-            <div className="size-24">
-              <CircularProgressbar
-                styles={buildStyles({
-                  strokeLinecap: "round",
-                  pathColor: `rgba(37, 99, 235)`,
-                  trailColor: "#d6d6d6",
-                  textColor: "#2563EB",
-                  textSize: "1.5rem",
-                })}
-                value={41}
-                text={"41%"}
-              />
-            </div>
-
-            <div className="mt-2 grow text-pretty text-center text-base font-medium text-slate-600">
-              12 jackets needed
-            </div>
-          </div>
+                <div className="mt-2 grow text-pretty text-center text-base font-medium text-slate-600">
+                  {donation.current} {donation.item} needed
+                </div>
+              </div>
+            ),
+          )}
         </div>
 
         <div className="mt-8 flex items-center justify-center gap-x-2">
