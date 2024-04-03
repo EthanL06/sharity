@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
   const data = await res.json();
 
-  const placesData = data["data"].map((result) => {
+  const placesData = data["data"].map((result: any) => {
     const { name, full_address, latitude, longitude } = result;
 
     return {
