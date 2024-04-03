@@ -15,7 +15,7 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "sharity.",
+  title: "sharity - a donation platform",
   description: "Donating made easy.",
 };
 

@@ -106,13 +106,15 @@ export default function Home() {
             whileInView="animate"
             custom={2.5}
           >
-            <Button
-              className="rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
-              size={"lg"}
-              variant={"outline"}
-            >
-              Request Donations
-            </Button>
+            <Link href="/requests">
+              <Button
+                className="rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+                size={"lg"}
+                variant={"outline"}
+              >
+                Request Donations
+              </Button>
+            </Link>
           </motion.div>
         </div>
 

@@ -8,13 +8,22 @@ import {
   Box,
   CircleHelp,
   CloudUpload,
+  Search,
   TrashIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import ManualInput from "./components/manual-input";
 import { useList } from "@/context/ListContext";
-import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type ListItem = {
   name: string;
@@ -23,6 +32,7 @@ type ListItem = {
 };
 
 const Page = (props: Props) => {
+  const router = useRouter();
   const { list, setList } = useList();
   const [files, setFiles] = useState<FileList>();
   const [loading, setLoading] = useState(false);
@@ -65,6 +75,23 @@ const Page = (props: Props) => {
       });
     });
 
+    // If there already items in the list, combine them with the new items
+    if (list.length > 0) {
+      const combinedItems: ListItem[] = [];
+      list.forEach((item) => {
+        const existingItem = newItems.find(
+          (newItem) => newItem.name === item.name,
+        );
+        if (existingItem) {
+          existingItem.quantity += item.quantity;
+        } else {
+          combinedItems.push(item);
+        }
+      });
+
+      newItems.push(...combinedItems);
+    }
+
     setList(newItems);
   };
 
@@ -88,18 +115,38 @@ const Page = (props: Props) => {
   };
 
   return (
-    <div className="grid min-h-96 grid-cols-2 grid-rows-1 space-x-8 divide-x-4 divide-dotted px-20 py-12 ">
-      <div className="flex flex-col justify-between">
+    <div className=" grid min-h-[calc(100vh-150px)] grid-cols-2 grid-rows-1 space-x-8 divide-x-4 divide-dotted px-20 py-12">
+      <div className="flex flex-col ">
         <div className="space-y-8">
           <div className="space-y-1">
             <h1 className="relative inline-flex items-center gap-x-1  text-4xl font-bold">
               <span>Scan Items to Donate </span>
-              <Button className="rounded-full" size={"icon"} variant={"ghost"}>
-                <CircleHelp
-                  strokeWidth={2.5}
-                  className="size-6 text-slate-500"
-                />
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    className="rounded-full"
+                    size={"icon"}
+                    variant={"ghost"}
+                  >
+                    <CircleHelp
+                      strokeWidth={2.5}
+                      className="size-6 text-slate-500"
+                    />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                      About Scanning Items
+                    </DialogTitle>
+                    <DialogDescription className="text-base">
+                      Uploaded images are sent to our servers where they are
+                      processed by our AI object detection model. Images are not
+                      stored on our servers.
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
             </h1>
             <p className="text-2xl">
               Upload images of your donation items. We will handle the rest.
@@ -153,7 +200,7 @@ const Page = (props: Props) => {
 
           <div className="pb-6">
             {files && (
-              <div className="flex max-h-[15rem] flex-col gap-4 overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-300 scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
+              <div className="flex h-full max-h-[30rem] flex-col gap-4 overflow-y-auto scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-300 scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
                 {Array.from(files).map((file, index) => (
                   <div
                     key={index}
@@ -223,19 +270,30 @@ const Page = (props: Props) => {
           </div>
         </div>
 
-        <div className="flex flex-row-reverse">
-          {/* <Link href={"/map"}> */}
+        <div className="flex flex-row-reverse gap-x-2">
           <Button
-            disabled={loading}
-            onClick={sendFiles}
-            className="sticky bottom-0 space-x-4 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+            onClick={() => router.push("/map")}
+            disabled={list.length === 0 || loading}
+            className="sticky bottom-0 space-x-3 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
             variant={"default"}
             size={"lg"}
           >
-            <span>Scan</span>
+            <span>Confirm Items</span>
+
             <ArrowRightCircle strokeWidth={3} />
           </Button>
-          {/* </Link> */}
+
+          <Button
+            disabled={loading || !files}
+            onClick={sendFiles}
+            className="sticky bottom-0 space-x-3 rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+            variant={"default"}
+            size={"lg"}
+          >
+            <span>Scan Images</span>
+
+            <Search strokeWidth={3} />
+          </Button>
         </div>
       </div>
 
@@ -259,12 +317,9 @@ const Page = (props: Props) => {
           </svg>
         </h2>
 
-        <div className="h-full max-h-[30rem] space-y-8 overflow-y-auto pr-4 scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-300 scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
+        <div className="h-full max-h-full space-y-8 overflow-y-auto pr-4 scrollbar-thin scrollbar-track-slate-50 scrollbar-thumb-slate-300 scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
           {list.map((item, index) => (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
+            <div
               key={item.name + "-" + index}
               className="flex items-center justify-between space-x-4"
             >
@@ -286,7 +341,7 @@ const Page = (props: Props) => {
                   <TrashIcon strokeWidth={2.75} className="text-red-500" />
                 </Button>
               </div>
-            </motion.div>
+            </div>
           ))}
 
           {

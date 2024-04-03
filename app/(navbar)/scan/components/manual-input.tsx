@@ -57,7 +57,14 @@ const ManualInput = (props: Props) => {
       quantity: parseInt(values.quantity),
       icon: <Box className="size-8" />,
     };
-    setList([...list, item]);
+    // If the item name already exists, increment the quantity
+    const existingItem = list.find((item) => item.name === values.name);
+    if (existingItem) {
+      existingItem.quantity += item.quantity;
+      setList([...list]);
+    } else {
+      setList([...list, item]);
+    }
     form.reset();
 
     setOpen(false);

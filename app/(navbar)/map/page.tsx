@@ -1,22 +1,37 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import Map, { Marker } from "react-map-gl";
-import ReactMapGl from "react-map-gl";
+import Map, { MapRef, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { MapPin } from "lucide-react";
+import { ArrowLeftCircle, ArrowRightCircle, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import mapboxgl from "mapbox-gl";
-
-// mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY as string;
+import { useList } from "@/context/ListContext";
+import { Button } from "@/components/ui/button";
+import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { Separator } from "@/components/ui/separator";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type Props = {};
 const Page = (props: Props) => {
-  // const mapContainer = useRef(null);
-  // const map = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<MapRef | null>(null);
+  const { list, setList } = useList();
   const [lng, setLng] = useState<number>();
   const [lat, setLat] = useState<number>();
   const [zoom, setZoom] = useState(11);
+
+  const [placeIndex, setPlaceIndex] = useState(0);
 
   const places = [
     {
@@ -24,12 +39,6 @@ const Page = (props: Props) => {
       latitude: 29.802444299999998,
       longitude: -95.80743009999999,
       address: "5140 Franz Rd Suite 700, Katy, TX 77493",
-    },
-    {
-      name: "ARTreach",
-      latitude: 29.754117599999997,
-      longitude: -95.55035,
-      address: "Unknown",
     },
     {
       name: "Katy Heritage Society",
@@ -111,32 +120,183 @@ const Page = (props: Props) => {
     },
   ];
 
+  const flyToPlace = (index: number) => {
+    let placeIndex = index % places.length;
+
+    mapRef.current?.flyTo({
+      center: [places[placeIndex].longitude, places[placeIndex].latitude],
+      animate: true,
+      zoom: 20,
+    });
+  };
+
   useEffect(() => {
     // Ask for user's location
     navigator.geolocation.getCurrentPosition((position) => {
       setLng(position.coords.longitude);
       setLat(position.coords.latitude);
     });
-
-    // if (map.current || lng == undefined || lat == undefined) return; // initialize map only once
-    // map.current = new mapboxgl.Map({
-    //   container: mapContainer.current as unknown as HTMLElement,
-    //   style: "mapbox://styles/mapbox/streets-v12",
-    //   center: [lng, lat],
-    //   zoom: zoom,
-    //   pitch: 65,
-    // });
   }, [lng, lat]);
 
   return (
-    <div className="grid h-full grow grid-cols-6 grid-rows-1 overflow-x-hidden">
-      <div className="col-span-1">test</div>
-      {/* <div ref={mapContainer} className="col-span-5 h-[calc(100vh-89px)]" /> */}
+    <div className="grid h-full grow grid-cols-10 grid-rows-1 overflow-x-hidden">
+      <div className="col-span-3  px-8 pt-8">
+        <h1 className="text-center text-4xl font-semibold">
+          Locations Near You.
+        </h1>
+        <p className="mx-auto mt-1 text-pretty text-center text-base text-slate-600">
+          Nearby food banks, shelters, non-profits, and other organizations that
+          match with your donations.
+        </p>
 
-      <div className="col-span-5">
+        <Separator className="mt-6" />
+
+        <div className="mt-6 flex items-center justify-center gap-x-4">
+          <Button
+            className="rounded-full"
+            size={"icon"}
+            variant={"default"}
+            onClick={() => {
+              if (placeIndex == 0) {
+                flyToPlace(places.length - 1);
+                setPlaceIndex(places.length - 1);
+                return;
+              }
+              flyToPlace((placeIndex - 1) % places.length);
+              setPlaceIndex((placeIndex - 1) % places.length);
+            }}
+          >
+            <ArrowLeftCircle />
+          </Button>
+          <div className="flex grow flex-col">
+            <Link
+              className="w-full text-center text-2xl font-bold text-primary hover:underline"
+              href={`https://maps.google.com/maps?q=${places[placeIndex % places.length].latitude},${places[placeIndex % places.length].longitude}`}
+            >
+              {places[placeIndex % places.length].name}
+            </Link>
+
+            <div className="text-center font-medium">
+              {places[placeIndex % places.length].address}
+            </div>
+          </div>
+          <Button
+            className="rounded-full"
+            size={"icon"}
+            variant={"default"}
+            onClick={() => {
+              flyToPlace((placeIndex + 1) % places.length);
+              setPlaceIndex((placeIndex + 1) % places.length);
+            }}
+          >
+            <ArrowRightCircle />
+          </Button>
+        </div>
+
+        <div className=" mt-6 text-center text-2xl font-semibold text-slate-700">
+          Donations Needed
+        </div>
+        <div className="mt-4 grid grid-cols-3 grid-rows-1 gap-x-2">
+          <div className=" flex flex-col items-center justify-center rounded px-1 py-4 outline outline-green-300">
+            <div className="size-24">
+              <CircularProgressbar
+                styles={buildStyles({
+                  strokeLinecap: "round",
+                  pathColor: `rgba(37, 99, 235)`,
+                  trailColor: "#d6d6d6",
+                  textColor: "#2563EB",
+                  textSize: "1.5rem",
+                })}
+                value={70}
+                text={"70%"}
+              />
+            </div>
+
+            <div className="mt-2 grow text-pretty text-center text-base font-medium text-slate-600">
+              26 blankets needed
+            </div>
+          </div>
+
+          <div className=" flex flex-col items-center justify-center rounded border px-1 py-4">
+            <div className="size-24">
+              <CircularProgressbar
+                styles={buildStyles({
+                  strokeLinecap: "round",
+                  pathColor: `rgba(37, 99, 235)`,
+                  trailColor: "#d6d6d6",
+                  textColor: "#2563EB",
+                  textSize: "1.5rem",
+                })}
+                value={30}
+                text={"30%"}
+              />
+            </div>
+
+            <div className="mt-2 grow text-pretty text-center text-base font-medium text-slate-600">
+              55 canned goods needed
+            </div>
+          </div>
+
+          <div className=" flex flex-col items-center justify-center rounded border px-1 py-4">
+            <div className="size-24">
+              <CircularProgressbar
+                styles={buildStyles({
+                  strokeLinecap: "round",
+                  pathColor: `rgba(37, 99, 235)`,
+                  trailColor: "#d6d6d6",
+                  textColor: "#2563EB",
+                  textSize: "1.5rem",
+                })}
+                value={41}
+                text={"41%"}
+              />
+            </div>
+
+            <div className="mt-2 grow text-pretty text-center text-base font-medium text-slate-600">
+              12 jackets needed
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 flex items-center justify-center gap-x-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                className="rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+                variant={"default"}
+                size={"lg"}
+              >
+                Confirm Donation!
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="bg-gradient-to-r from-primary to-pink-400 bg-clip-text text-center text-2xl font-bold text-transparent">
+                  Thank you for donating!
+                </DialogTitle>
+                <DialogDescription className="text-pretty text-center text-base font-medium leading-loose text-black">
+                  Please drop off your donations at the selected location. Your
+                  support is greatly appreciated!
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button className="mx-auto" type="button" variant={"outline"}>
+                    Close
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <div className="col-span-7">
         {lng != undefined && lat != undefined && (
           <>
-            <ReactMapGl
+            <Map
+              ref={mapRef}
+              id="map"
               mapLib={import("mapbox-gl")}
               mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_KEY}
               initialViewState={{
@@ -150,16 +310,11 @@ const Page = (props: Props) => {
                 setLng(e.viewState.longitude);
                 setLat(e.viewState.latitude);
                 setZoom(e.viewState.zoom);
-                console.log(e.viewState.zoom);
               }}
               mapStyle="mapbox://styles/mapbox/streets-v9"
-              maxZoom={15}
+              maxZoom={18}
               minZoom={12}
             >
-              {/* <Marker latitude={lat} longitude={lng}>
-                <div>📍</div>
-              </Marker> */}
-
               {places.map((place) => (
                 <div className={"hidden"} key={place.name}>
                   <Marker
@@ -167,19 +322,23 @@ const Page = (props: Props) => {
                     latitude={place.latitude}
                     longitude={place.longitude}
                   >
-                    <div
+                    <button
+                      onClick={() => {
+                        flyToPlace(places.indexOf(place));
+                        setPlaceIndex(places.indexOf(place));
+                      }}
                       className={cn(
-                        " items-center gap-x-1 rounded-lg bg-black/80 p-1 font-sans font-bold text-blue-100 ",
+                        " items-center gap-x-1 rounded-lg bg-black/80 p-1 font-sans font-bold text-blue-100 hover:cursor-pointer",
                         zoom < 10 ? "hidden" : "flex",
                       )}
                     >
                       <MapPin />
                       <span className="">{place.name}</span>
-                    </div>
+                    </button>
                   </Marker>
                 </div>
               ))}
-            </ReactMapGl>
+            </Map>
           </>
         )}
       </div>
