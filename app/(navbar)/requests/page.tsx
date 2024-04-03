@@ -18,7 +18,7 @@ import DonationItemFormThree from "./components/donation-item-form-three";
 
 type Props = {};
 const Page = (props: Props) => {
-  const [page, setPage] = useState(5);
+  const [page, setPage] = useState(1);
   const [formData, setFormData] = useState({});
 
   const nextPage = () => {
