@@ -362,7 +362,11 @@ const Page = (props: Props) => {
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button className="mx-auto" type="button" variant={"outline"}>
+                  <Button
+                    className="mx-auto"
+                    type="button"
+                    variant={"destructive"}
+                  >
                     Close
                   </Button>
                 </DialogClose>

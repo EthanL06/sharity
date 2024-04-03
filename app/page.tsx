@@ -19,7 +19,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative flex flex-1 items-center justify-center space-y-4 p-8 pt-6">
+    <main className="relative flex flex-1 items-center justify-center space-y-4 px-4 pt-6 sm:p-8">
       <div className="relative flex  h-[35rem] w-full flex-col items-center justify-center rounded-md   antialiased  bg-dot-large-slate-400/50">
         <div className="mx-auto mb-2 flex max-w-3xl flex-col items-center p-4">
           <div className="flex flex-col items-center">
@@ -52,8 +52,8 @@ export default function Home() {
             initial="initial"
             whileInView="animate"
             custom={1}
-            className="text-balanced relative 
-         z-20 mt-3 text-center font-sans text-4xl  font-semibold md:text-5xl md:leading-tight"
+            className="relative z-20 
+         mt-3 w-full grow text-pretty text-center  font-sans text-3xl  font-semibold sm:text-4xl md:text-5xl md:leading-tight"
           >
             We make
             <br />
@@ -82,16 +82,17 @@ export default function Home() {
           </motion.div>
         </div>
 
-        <div className="z-20 mx-auto flex gap-x-2">
+        <div className="z-20 mx-auto flex flex-wrap justify-center gap-2">
           <motion.div
             variants={fadeInAnimationVariants}
             initial="initial"
             whileInView="animate"
             custom={2}
+            className="grow"
           >
             <Link href="/scan">
               <Button
-                className="rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+                className="w-full rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
                 variant={"default"}
                 size={"lg"}
               >
@@ -105,10 +106,11 @@ export default function Home() {
             initial="initial"
             whileInView="animate"
             custom={2.5}
+            className="grow"
           >
             <Link href="/requests">
               <Button
-                className="rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
+                className="w-full grow rounded-full py-7 text-lg font-semibold md:py-8 md:text-xl"
                 size={"lg"}
                 variant={"outline"}
               >
