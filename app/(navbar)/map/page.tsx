@@ -28,178 +28,181 @@ type Place = {
   latitude: number;
   longitude: number;
   address: string;
+  donationsNeeded: { item: string; current: number; needs: number }[];
 };
 
 type Props = {};
 const Page = (props: Props) => {
   const mapRef = useRef<MapRef | null>(null);
   const { list, setList } = useList();
-  const [lng, setLng] = useState<number>();
-  const [lat, setLat] = useState<number>();
+  const [lng, setLng] = useState<number>(-Infinity);
+  const [lat, setLat] = useState<number>(-Infinity);
   const [initialLng, setInitialLng] = useState<number>();
   const [initialLat, setInitialLat] = useState<number>();
   const [zoom, setZoom] = useState(11);
+
+  const [places, setPlaces] = useState<Place[]>([]);
 
   // const [places, setPlaces] = useState<Place[]>([]);
 
   const [placeIndex, setPlaceIndex] = useState(0);
 
-  const places = [
-    {
-      name: "A Heart Like His Ministries",
-      latitude: 29.802444299999998,
-      longitude: -95.80743009999999,
-      address: "5140 Franz Rd Suite 700, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "blanket", current: 20, needs: 50 },
-        { item: "canned food", current: 25, needs: 40 },
-        { item: "toiletries", current: 15, needs: 30 },
-      ],
-    },
-    {
-      name: "Katy Heritage Society",
-      latitude: 29.791165,
-      longitude: -95.82595239999999,
-      address: "5990 George Bush Dr, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "hygiene products", current: 10, needs: 25 },
-        { item: "baby formula", current: 30, needs: 60 },
-        { item: "socks", current: 40, needs: 70 },
-      ],
-    },
-    {
-      name: "The Arc Of Katy",
-      latitude: 29.7944224,
-      longitude: -95.8241022,
-      address: "5819 10th St C, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "school supplies", current: 20, needs: 45 },
-        { item: "diapers", current: 15, needs: 35 },
-        { item: "winter coats", current: 25, needs: 50 },
-      ],
-    },
-    {
-      name: "Color Codes Foundation",
-      latitude: 29.7880394,
-      longitude: -95.79476269999999,
-      address: "24600 Katy Fwy Suite 834 - 1075, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "books", current: 30, needs: 60 },
-        { item: "canned soup", current: 20, needs: 40 },
-        { item: "gloves", current: 10, needs: 30 },
-      ],
-    },
-    {
-      name: "St. Vincent de Paul Society",
-      latitude: 29.797258699999997,
-      longitude: -95.8137802,
-      address: "5356 11th St, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "cleaning supplies", current: 15, needs: 35 },
-        { item: "non-perishable food", current: 25, needs: 50 },
-        { item: "winter hats", current: 20, needs: 40 },
-      ],
-    },
-    {
-      name: "Act of Life Inc.",
-      latitude: 29.7867236,
-      longitude: -95.820758,
-      address: "5510 1st St, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "baby clothes", current: 30, needs: 60 },
-        { item: "cereal", current: 20, needs: 40 },
-        { item: "toothbrushes", current: 10, needs: 30 },
-      ],
-    },
-    {
-      name: "Vanessa's Big Heart Foundation",
-      latitude: 29.747612099999998,
-      longitude: -95.7729732,
-      address: "2306 Morning Park Dr, Katy, TX 77494",
-      donationsNeeded: [
-        { item: "toys", current: 25, needs: 50 },
-        { item: "juice boxes", current: 15, needs: 30 },
-        { item: "baby wipes", current: 20, needs: 40 },
-      ],
-    },
-    {
-      name: "Baraka Services",
-      latitude: 29.7695208,
-      longitude: -95.7880611,
-      address: "24222 Calico Trace Ln, Katy, TX 77494",
-      donationsNeeded: [
-        { item: "bedding sets", current: 20, needs: 45 },
-        { item: "canned vegetables", current: 30, needs: 60 },
-        { item: "socks", current: 25, needs: 50 },
-      ],
-    },
-    {
-      name: "Heart4Heroes",
-      latitude: 29.785776499999997,
-      longitude: -95.8245093,
-      address: "None, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "first aid kits", current: 15, needs: 30 },
-        { item: "rice", current: 20, needs: 40 },
-        { item: "baby blankets", current: 25, needs: 50 },
-      ],
-    },
-    {
-      name: "Katy Responds",
-      latitude: 29.733881,
-      longitude: -95.763025,
-      address: "22765 Westheimer Pkwy, Katy, TX 77450",
-      donationsNeeded: [
-        { item: "canned meat", current: 20, needs: 40 },
-        { item: "backpacks", current: 25, needs: 50 },
-        { item: "feminine hygiene products", current: 15, needs: 30 },
-      ],
-    },
-    {
-      name: "Young Life",
-      latitude: 29.776955299999997,
-      longitude: -95.7438576,
-      address: "423 Mason Park Blvd b1, Katy, TX 77450",
-      donationsNeeded: [
-        { item: "winter gloves", current: 25, needs: 50 },
-        { item: "snacks", current: 20, needs: 40 },
-        { item: "flashlights", current: 15, needs: 30 },
-      ],
-    },
-    {
-      name: "Joe Joe Bear Foundation",
-      latitude: 29.792361999999997,
-      longitude: -95.723044,
-      address: "1846 Snake River Rd, Katy, TX 77449",
-      donationsNeeded: [
-        { item: "teddy bears", current: 30, needs: 60 },
-        { item: "pasta", current: 20, needs: 40 },
-        { item: "coloring books", current: 25, needs: 50 },
-      ],
-    },
-    {
-      name: "Compassion Katy",
-      latitude: 29.7746042,
-      longitude: -95.73002319999999,
-      address: "802 Dominion Dr #900a, Katy, TX 77450",
-      donationsNeeded: [
-        { item: "school uniforms", current: 15, needs: 30 },
-        { item: "canned fruit", current: 20, needs: 40 },
-        { item: "toothpaste", current: 25, needs: 50 },
-      ],
-    },
-    {
-      name: "Making Things Matter",
-      latitude: 29.732466,
-      longitude: -95.7637898,
-      address: "5703 2nd St, Katy, TX 77493",
-      donationsNeeded: [
-        { item: "pillows", current: 20, needs: 45 },
-        { item: "canned beans", current: 25, needs: 50 },
-        { item: "soap", current: 15, needs: 30 },
-      ],
-    },
-  ];
+  // const places = [
+  //   {
+  //     name: "A Heart Like His Ministries",
+  //     latitude: 29.802444299999998,
+  //     longitude: -95.80743009999999,
+  //     address: "5140 Franz Rd Suite 700, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "blanket", current: 20, needs: 50 },
+  //       { item: "canned food", current: 25, needs: 40 },
+  //       { item: "toiletries", current: 15, needs: 30 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Katy Heritage Society",
+  //     latitude: 29.791165,
+  //     longitude: -95.82595239999999,
+  //     address: "5990 George Bush Dr, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "hygiene products", current: 10, needs: 25 },
+  //       { item: "baby formula", current: 30, needs: 60 },
+  //       { item: "socks", current: 40, needs: 70 },
+  //     ],
+  //   },
+  //   {
+  //     name: "The Arc Of Katy",
+  //     latitude: 29.7944224,
+  //     longitude: -95.8241022,
+  //     address: "5819 10th St C, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "school supplies", current: 20, needs: 45 },
+  //       { item: "diapers", current: 15, needs: 35 },
+  //       { item: "winter coats", current: 25, needs: 50 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Color Codes Foundation",
+  //     latitude: 29.7880394,
+  //     longitude: -95.79476269999999,
+  //     address: "24600 Katy Fwy Suite 834 - 1075, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "books", current: 30, needs: 60 },
+  //       { item: "canned soup", current: 20, needs: 40 },
+  //       { item: "gloves", current: 10, needs: 30 },
+  //     ],
+  //   },
+  //   {
+  //     name: "St. Vincent de Paul Society",
+  //     latitude: 29.797258699999997,
+  //     longitude: -95.8137802,
+  //     address: "5356 11th St, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "cleaning supplies", current: 15, needs: 35 },
+  //       { item: "non-perishable food", current: 25, needs: 50 },
+  //       { item: "winter hats", current: 20, needs: 40 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Act of Life Inc.",
+  //     latitude: 29.7867236,
+  //     longitude: -95.820758,
+  //     address: "5510 1st St, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "baby clothes", current: 30, needs: 60 },
+  //       { item: "cereal", current: 20, needs: 40 },
+  //       { item: "toothbrushes", current: 10, needs: 30 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Vanessa's Big Heart Foundation",
+  //     latitude: 29.747612099999998,
+  //     longitude: -95.7729732,
+  //     address: "2306 Morning Park Dr, Katy, TX 77494",
+  //     donationsNeeded: [
+  //       { item: "toys", current: 25, needs: 50 },
+  //       { item: "juice boxes", current: 15, needs: 30 },
+  //       { item: "baby wipes", current: 20, needs: 40 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Baraka Services",
+  //     latitude: 29.7695208,
+  //     longitude: -95.7880611,
+  //     address: "24222 Calico Trace Ln, Katy, TX 77494",
+  //     donationsNeeded: [
+  //       { item: "bedding sets", current: 20, needs: 45 },
+  //       { item: "canned vegetables", current: 30, needs: 60 },
+  //       { item: "socks", current: 25, needs: 50 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Heart4Heroes",
+  //     latitude: 29.785776499999997,
+  //     longitude: -95.8245093,
+  //     address: "None, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "first aid kits", current: 15, needs: 30 },
+  //       { item: "rice", current: 20, needs: 40 },
+  //       { item: "baby blankets", current: 25, needs: 50 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Katy Responds",
+  //     latitude: 29.733881,
+  //     longitude: -95.763025,
+  //     address: "22765 Westheimer Pkwy, Katy, TX 77450",
+  //     donationsNeeded: [
+  //       { item: "canned meat", current: 20, needs: 40 },
+  //       { item: "backpacks", current: 25, needs: 50 },
+  //       { item: "feminine hygiene products", current: 15, needs: 30 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Young Life",
+  //     latitude: 29.776955299999997,
+  //     longitude: -95.7438576,
+  //     address: "423 Mason Park Blvd b1, Katy, TX 77450",
+  //     donationsNeeded: [
+  //       { item: "winter gloves", current: 25, needs: 50 },
+  //       { item: "snacks", current: 20, needs: 40 },
+  //       { item: "flashlights", current: 15, needs: 30 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Joe Joe Bear Foundation",
+  //     latitude: 29.792361999999997,
+  //     longitude: -95.723044,
+  //     address: "1846 Snake River Rd, Katy, TX 77449",
+  //     donationsNeeded: [
+  //       { item: "teddy bears", current: 30, needs: 60 },
+  //       { item: "pasta", current: 20, needs: 40 },
+  //       { item: "coloring books", current: 25, needs: 50 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Compassion Katy",
+  //     latitude: 29.7746042,
+  //     longitude: -95.73002319999999,
+  //     address: "802 Dominion Dr #900a, Katy, TX 77450",
+  //     donationsNeeded: [
+  //       { item: "school uniforms", current: 15, needs: 30 },
+  //       { item: "canned fruit", current: 20, needs: 40 },
+  //       { item: "toothpaste", current: 25, needs: 50 },
+  //     ],
+  //   },
+  //   {
+  //     name: "Making Things Matter",
+  //     latitude: 29.732466,
+  //     longitude: -95.7637898,
+  //     address: "5703 2nd St, Katy, TX 77493",
+  //     donationsNeeded: [
+  //       { item: "pillows", current: 20, needs: 45 },
+  //       { item: "canned beans", current: 25, needs: 50 },
+  //       { item: "soap", current: 15, needs: 30 },
+  //     ],
+  //   },
+  // ];
 
   const flyToPlace = (index: number) => {
     let placeIndex = index % places.length;
@@ -211,26 +214,26 @@ const Page = (props: Props) => {
     });
   };
 
-  // useEffect(() => {
-  //   if (initialLng == undefined || initialLat == undefined) {
-  //     return;
-  //   }
+  useEffect(() => {
+    if (initialLng == undefined || initialLat == undefined) {
+      return;
+    }
 
-  //   console.log(initialLng, initialLat);
+    console.log(initialLng, initialLat);
 
-  //   fetch(`/api/find_nearby?lat=${initialLng}&lon=${initialLat}`)
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       console.log(data);
-  //       setPlaces(data);
-  //     });
-  // }, [initialLng, initialLat]);
+    fetch(`/api/find_nearby?lat=${initialLat}&lon=${initialLng}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setPlaces(data);
+      });
+  }, [initialLng, initialLat]);
 
   useEffect(() => {
     // Ask for user's location
     navigator.geolocation.getCurrentPosition((position) => {
-      setLng(-95.816528);
-      setLat(29.794861);
+      setLng(position.coords.longitude);
+      setLat(position.coords.latitude);
 
       setInitialLng(position.coords.longitude);
       setInitialLat(position.coords.latitude);
@@ -238,7 +241,26 @@ const Page = (props: Props) => {
   }, [lng, lat]);
 
   if (places.length == 0) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center gap-1 p-8 text-xl font-medium">
+        <svg
+          aria-hidden="true"
+          className="h-8 w-8 animate-spin fill-blue-600 text-gray-200 dark:text-gray-600"
+          viewBox="0 0 100 101"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+            fill="currentColor"
+          />
+          <path
+            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+            fill="currentFill"
+          />
+        </svg>
+      </div>
+    );
   }
 
   const isIncludedInList = (item: string) => {
@@ -377,7 +399,7 @@ const Page = (props: Props) => {
       </div>
 
       <div className="col-span-7">
-        {lng != undefined && lat != undefined && (
+        {lng != -Infinity && lat != -Infinity && (
           <>
             <Map
               ref={mapRef}
@@ -397,32 +419,42 @@ const Page = (props: Props) => {
                 setZoom(e.viewState.zoom);
               }}
               mapStyle="mapbox://styles/mapbox/streets-v9"
-              maxZoom={18}
               minZoom={12}
             >
-              {places.map((place) => (
-                <div className={"hidden"} key={place.name}>
-                  <Marker
-                    key={place.name}
-                    latitude={place.latitude}
-                    longitude={place.longitude}
-                  >
-                    <button
-                      onClick={() => {
-                        flyToPlace(places.indexOf(place));
-                        setPlaceIndex(places.indexOf(place));
-                      }}
-                      className={cn(
-                        " items-center gap-x-1 rounded-lg bg-black/80 p-1 font-sans font-bold text-blue-100 hover:cursor-pointer",
-                        zoom < 10 ? "hidden" : "flex",
-                      )}
+              {places.map((place) => {
+                console.log(place);
+                if (
+                  place.latitude == undefined ||
+                  place.longitude == undefined
+                ) {
+                  console.log("skipping");
+                  return <></>;
+                }
+
+                return (
+                  <div key={place.name}>
+                    <Marker
+                      key={place.name}
+                      latitude={place.latitude}
+                      longitude={place.longitude}
                     >
-                      <MapPin />
-                      <span className="">{place.name}</span>
-                    </button>
-                  </Marker>
-                </div>
-              ))}
+                      <button
+                        onClick={() => {
+                          flyToPlace(places.indexOf(place));
+                          setPlaceIndex(places.indexOf(place));
+                        }}
+                        className={cn(
+                          " items-center gap-x-1 rounded-lg bg-black/80 p-1 font-sans font-bold text-blue-100 hover:cursor-pointer",
+                          zoom < 10 ? "hidden" : "flex",
+                        )}
+                      >
+                        <MapPin />
+                        <span className="">{place.name}</span>
+                      </button>
+                    </Marker>
+                  </div>
+                );
+              })}
             </Map>
           </>
         )}
